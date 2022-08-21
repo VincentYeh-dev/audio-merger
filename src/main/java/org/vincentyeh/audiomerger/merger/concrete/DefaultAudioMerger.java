@@ -2,6 +2,7 @@ package org.vincentyeh.audiomerger.merger.concrete;
 
 import org.vincentyeh.audiomerger.merger.framework.AudioFileType;
 import org.vincentyeh.audiomerger.merger.framework.AudioMerger;
+import org.vincentyeh.audiomerger.recorder.framework.Recorder;
 
 import javax.sound.sampled.*;
 import java.io.*;
@@ -28,36 +29,42 @@ public class DefaultAudioMerger implements AudioMerger {
             throw new IllegalStateException("WTF is that??");
     }
 
+
+
     @Override
     public void merge(List<File> audioFiles, File destination) throws IOException, UnsupportedAudioFileException {
-        merge(audioFiles, destination);
+        merge(audioFiles, destination,null,null);
     }
 
     @Override
     public void merge(File[] audioFiles, File destination) throws IOException, UnsupportedAudioFileException {
-        merge(audioFiles, destination, null);
+        merge(audioFiles, destination, null,null);
     }
 
     @Override
-    public void merge(List<File> audioFiles, File destination, AudioMerger.Listener listener) throws IOException, UnsupportedAudioFileException {
-        merge(audioFiles.toArray(new File[0]), destination, listener);
+    public void merge(List<File> audioFiles, File destination, Listener listener, Recorder recorder) throws IOException, UnsupportedAudioFileException {
+        merge(audioFiles.toArray(new File[0]), destination, listener,recorder);
     }
 
     @Override
-    public void merge(File[] audioFiles, File destination, AudioMerger.Listener listener) throws IOException, UnsupportedAudioFileException {
-        var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destination.getName() + ".srt"), StandardCharsets.UTF_8));
-
+    public void merge(File[] audioFiles, File destination, AudioMerger.Listener listener,Recorder recorder) throws IOException, UnsupportedAudioFileException {
         var audioInputStreams = new AudioInputStream[audioFiles.length];
         long totalLength = 0;
         for (int i = 0; i < audioFiles.length; i++) {
             audioInputStreams[i] = AudioSystem.getAudioInputStream(audioFiles[i]);
             var frameLength = audioInputStreams[i].getFrameLength();
-
             var framePerSecond = audioInputStreams[i].getFormat().getFrameRate();
-            writeToSrt(i, writer, frameLength, totalLength, framePerSecond,audioFiles[i].getName());
+
+            var startFrame=totalLength+1;
+            var endFrame=totalLength+frameLength;
+            if(recorder!=null)
+                recorder.record(i,audioFiles.length,audioFiles[i],startFrame,endFrame,framePerSecond);
+
             totalLength += frameLength;
         }
-        writer.close();
+        if(recorder!=null)
+            recorder.close();
+
         var appendInputStream = new SequenceInputStream(new Enumeration<>() {
             int index = 0;
 
@@ -81,17 +88,6 @@ public class DefaultAudioMerger implements AudioMerger {
 
     }
 
-    private void writeToSrt(int i, BufferedWriter writer, long frameLength, long totalLength, float framePerSecond,String comment) throws IOException {
-        var start = getFormattedTime(totalLength + 1, framePerSecond);
-        var end = getFormattedTime(totalLength + 1 + frameLength, framePerSecond);
-        writer.write(i + 1 + "\n");
-        writer.write(format("%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n",
-                start[0], start[1], start[2], start[3],
-                end[0], end[1], end[2], end[3]
-        ));
-        writer.write(comment);
-        writer.write("\n\n");
-    }
 
     private int[] getFormattedTime(long frame, float framePerSecond) {
         var durationInSecond = frame / framePerSecond;

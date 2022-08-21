@@ -5,6 +5,8 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import org.vincentyeh.audiomerger.merger.concrete.DefaultAudioMerger;
 import org.vincentyeh.audiomerger.merger.framework.AudioFileType;
+import org.vincentyeh.audiomerger.recorder.concrete.SrtRecorder;
+import org.vincentyeh.audiomerger.recorder.framework.Recorder;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
@@ -15,6 +17,7 @@ import java.awt.event.HierarchyListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -64,7 +67,7 @@ public class MainFrame {
                                 progressBar_progress.setMaximum(total);
                                 progressBar_progress.setValue(index + 1);
                                 label_progress.setText(format("%d/%d", index + 1, total));
-                            });
+                            }, getRecorder(new File(destination.getParent(), destination.getName() + ".srt")));
                     panel_progress.setVisible(false);
                 } catch (IOException | UnsupportedAudioFileException ex) {
                     throw new RuntimeException(ex);
@@ -101,6 +104,15 @@ public class MainFrame {
                 }
             }
         });
+    }
+
+    private Recorder getRecorder(File recordDestination) throws FileNotFoundException {
+        return new SrtRecorder(recordDestination) {
+            @Override
+            protected String getSubtitle(File file) {
+                return file.getName();
+            }
+        };
     }
 
     private File selectFilePathToSave() {
