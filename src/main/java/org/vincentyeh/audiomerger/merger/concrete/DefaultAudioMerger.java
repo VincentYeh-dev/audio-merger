@@ -22,11 +22,8 @@ import org.vincentyeh.audiomerger.recorder.framework.Recorder;
 
 import javax.sound.sampled.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.List;
-
-import static java.lang.String.format;
 
 public class DefaultAudioMerger implements AudioMerger {
 
@@ -102,14 +99,4 @@ public class DefaultAudioMerger implements AudioMerger {
 
     }
 
-
-    private int[] getFormattedTime(long frame, float framePerSecond) {
-        var durationInSecond = frame / framePerSecond;
-
-        var hours = durationInSecond / 3600;
-        var minutes = (durationInSecond % 3600) / 60;
-        var seconds = durationInSecond % 60;
-        var millis = (seconds - ((int) seconds)) * 1000;
-        return new int[]{(int) hours, (int) minutes, (int) seconds, (int) millis};
-    }
 }

@@ -13,7 +13,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -175,14 +174,11 @@ public class MainFrame {
     }
 
     private static void addHierarchyListener(JList<?> list) {
-        list.addHierarchyListener(new HierarchyListener() {
-            @Override
-            public void hierarchyChanged(HierarchyEvent e) {
-                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0
-                        && e.getComponent().isShowing()) {
-                    list.putClientProperty("List.isFileList", Boolean.FALSE);
-                    list.setLayoutOrientation(JList.VERTICAL);
-                }
+        list.addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0
+                    && e.getComponent().isShowing()) {
+                list.putClientProperty("List.isFileList", Boolean.FALSE);
+                list.setLayoutOrientation(JList.VERTICAL);
             }
         });
     }

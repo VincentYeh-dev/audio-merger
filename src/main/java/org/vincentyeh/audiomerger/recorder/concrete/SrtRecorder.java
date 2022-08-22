@@ -23,18 +23,6 @@ public abstract class SrtRecorder implements Recorder {
                 charset));
     }
 
-//    private void writeToSrt(int i, long frameLength, long totalLength, float framePerSecond, String comment) throws IOException {
-//        var start = getFormattedTime(totalLength + 1, framePerSecond);
-//        var end = getFormattedTime(totalLength + 1 + frameLength, framePerSecond);
-//        writer.write(i + 1 + "\n");
-//        writer.write(format("%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n",
-//                start[0], start[1], start[2], start[3],
-//                end[0], end[1], end[2], end[3]
-//        ));
-//        writer.write(comment);
-//        writer.write("\n\n");
-//    }
-
     private int[] getFormattedTime(long frame, float framePerSecond) {
         var durationInSecond = frame / framePerSecond;
 
