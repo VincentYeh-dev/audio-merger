@@ -1,0 +1,7 @@
+   ===================================================================================
+   ==  Notices and attributions required by libraries that the project depends on   ==
+   ===================================================================================
+
+ The audio-merger depends on junit-team junit4 (https://junit.org/junit4/).
+ The audio-merger depends on FormDev Software GmbH flatlaf (https://www.formdev.com/flatlaf/).
+ The audio-merger depends on jetbrains forms_rt (https://www.jetbrains.com/).
