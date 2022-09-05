@@ -16,5 +16,15 @@
 package org.vincentyeh.audiomerger.merger.framework;
 
 public enum AudioFileType {
-    WAV,AU,AIFF
+    WAV("wav"),AU("au"),AIFF("aiff");
+
+    private final String extension;
+
+    AudioFileType(String extension) {
+        this.extension = extension;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
 }
