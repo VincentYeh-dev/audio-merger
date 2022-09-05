@@ -5,6 +5,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import org.vincentyeh.audiomerger.merger.concrete.DefaultAudioMerger;
 import org.vincentyeh.audiomerger.merger.framework.AudioFileType;
+import org.vincentyeh.audiomerger.merger.framework.AudioMerger;
 import org.vincentyeh.audiomerger.recorder.concrete.SrtRecorder;
 import org.vincentyeh.audiomerger.recorder.framework.Recorder;
 
@@ -43,7 +44,7 @@ public class MainFrame {
         comboBox_file_format.setModel(new DefaultComboBoxModel<>(AudioFileType.values()));
         comboBox_file_format.updateUI();
         addButton.addActionListener(e -> {
-            var files = selectFilesPathToOpen();
+            File[] files = selectFilesPathToOpen();
             if (files != null) {
                 sources.addAll(Arrays.asList(files));
                 updateSourceList();
@@ -51,14 +52,14 @@ public class MainFrame {
         });
 
         mergeButton.addActionListener(e -> {
-            var type = (AudioFileType) comboBox_file_format.getSelectedItem();
-            var destination = selectFilePathToSave();
+            AudioFileType type = (AudioFileType) comboBox_file_format.getSelectedItem();
+            File destination = selectFilePathToSave();
 
             if (destination == null)
                 return;
 
             new Thread(() -> {
-                var merger = new DefaultAudioMerger(type);
+                AudioMerger merger = new DefaultAudioMerger(type);
                 try {
                     panel_progress.setVisible(true);
                     merger.merge(sources, destination,
@@ -115,11 +116,11 @@ public class MainFrame {
     }
 
     private File selectFilePathToSave() {
-        var chooser = getFixedFileChooser();
+        JFileChooser chooser = getFixedFileChooser();
         chooser.setCurrentDirectory(new File("").getAbsoluteFile());
         chooser.setMultiSelectionEnabled(false);
         chooser.setAcceptAllFileFilterUsed(false);
-        var option = chooser.showSaveDialog(null);
+        int option = chooser.showSaveDialog(null);
         if (option == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
         }
@@ -127,7 +128,7 @@ public class MainFrame {
     }
 
     private File[] selectFilesPathToOpen() {
-        var chooser = getFixedFileChooser();
+        JFileChooser chooser = getFixedFileChooser();
         chooser.setCurrentDirectory(new File("").getAbsoluteFile());
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.addChoosableFileFilter(
@@ -136,7 +137,7 @@ public class MainFrame {
         chooser.setMultiSelectionEnabled(true);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogTitle("Select audio files");
-        var option = chooser.showOpenDialog(null);
+        int option = chooser.showOpenDialog(null);
         if (option == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFiles();
         }
@@ -145,8 +146,8 @@ public class MainFrame {
 
     private void updateSourceList() {
         int index = 0;
-        var model = new DefaultListModel<String>();
-        for (var file : sources) {
+        DefaultListModel<String> model = new DefaultListModel<>();
+        for (File file : sources) {
             model.add(index++, file.getName());
         }
         list_sources.setModel(model);
@@ -156,7 +157,7 @@ public class MainFrame {
     }
 
     private static JFileChooser getFixedFileChooser() {
-        var chooser = new JFileChooser();
+        JFileChooser chooser = new JFileChooser();
         stream(chooser)
                 .filter(JList.class::isInstance)
                 .map(JList.class::cast)

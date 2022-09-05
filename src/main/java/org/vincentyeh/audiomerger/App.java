@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vincentyeh.audiomerger.ui;
+package org.vincentyeh.audiomerger;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.vincentyeh.audiomerger.ui.MainFrame;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -27,7 +28,7 @@ import java.awt.event.WindowEvent;
 public class App {
     public static void main(String[] args) {
         FlatDarkLaf.setup();
-        var frame = new JFrame("audio-merger");
+        JFrame frame = new JFrame("audio-merger");
         frame.setContentPane(new MainFrame().root);
         frame.pack();
         frame.setVisible(true);

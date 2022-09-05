@@ -41,42 +41,41 @@ public class DefaultAudioMerger implements AudioMerger {
     }
 
 
-
     @Override
     public void merge(List<File> audioFiles, File destination) throws IOException, UnsupportedAudioFileException {
-        merge(audioFiles, destination,null,null);
+        merge(audioFiles, destination, null, null);
     }
 
     @Override
     public void merge(File[] audioFiles, File destination) throws IOException, UnsupportedAudioFileException {
-        merge(audioFiles, destination, null,null);
+        merge(audioFiles, destination, null, null);
     }
 
     @Override
     public void merge(List<File> audioFiles, File destination, Listener listener, Recorder recorder) throws IOException, UnsupportedAudioFileException {
-        merge(audioFiles.toArray(new File[0]), destination, listener,recorder);
+        merge(audioFiles.toArray(new File[0]), destination, listener, recorder);
     }
 
     @Override
-    public void merge(File[] audioFiles, File destination, AudioMerger.Listener listener,Recorder recorder) throws IOException, UnsupportedAudioFileException {
-        var audioInputStreams = new AudioInputStream[audioFiles.length];
+    public void merge(File[] audioFiles, File destination, AudioMerger.Listener listener, Recorder recorder) throws IOException, UnsupportedAudioFileException {
+        AudioInputStream[] audioInputStreams = new AudioInputStream[audioFiles.length];
         long totalLength = 0;
         for (int i = 0; i < audioFiles.length; i++) {
             audioInputStreams[i] = AudioSystem.getAudioInputStream(audioFiles[i]);
-            var frameLength = audioInputStreams[i].getFrameLength();
-            var framePerSecond = audioInputStreams[i].getFormat().getFrameRate();
+            long frameLength = audioInputStreams[i].getFrameLength();
+            float framePerSecond = audioInputStreams[i].getFormat().getFrameRate();
 
-            var startFrame=totalLength+1;
-            var endFrame=totalLength+frameLength;
-            if(recorder!=null)
-                recorder.record(i,audioFiles.length,audioFiles[i],startFrame,endFrame,framePerSecond);
+            long startFrame = totalLength + 1;
+            long endFrame = totalLength + frameLength;
+            if (recorder != null)
+                recorder.record(i, audioFiles.length, audioFiles[i], startFrame, endFrame, framePerSecond);
 
             totalLength += frameLength;
         }
-        if(recorder!=null)
+        if (recorder != null)
             recorder.close();
 
-        var appendInputStream = new SequenceInputStream(new Enumeration<>() {
+        SequenceInputStream appendInputStream = new SequenceInputStream(new Enumeration<InputStream>() {
             int index = 0;
 
             @Override
@@ -92,7 +91,7 @@ public class DefaultAudioMerger implements AudioMerger {
             }
         });
 
-        var appendedFiles = new AudioInputStream(appendInputStream, audioInputStreams[0].getFormat(), totalLength);
+        AudioInputStream appendedFiles = new AudioInputStream(appendInputStream, audioInputStreams[0].getFormat(), totalLength);
         AudioSystem.write(appendedFiles, outputFormat, destination);
         appendedFiles.close();
         appendInputStream.close();
