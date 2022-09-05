@@ -28,7 +28,7 @@ import java.awt.event.WindowEvent;
 public class App {
     public static void main(String[] args) {
         FlatDarkLaf.setup();
-        JFrame frame = new JFrame("audio-merger");
+        JFrame frame = new JFrame(Constant.APP_TITLE);
         frame.setContentPane(new MainFrame().root);
         frame.pack();
         frame.setVisible(true);
