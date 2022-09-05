@@ -116,10 +116,11 @@ public class MainFrame {
     }
 
     private File selectFilePathToSave() {
-        JFileChooser chooser = getFixedFileChooser();
+        JFileChooser chooser = getReadOnlyChooser();
         chooser.setCurrentDirectory(new File("").getAbsoluteFile());
         chooser.setMultiSelectionEnabled(false);
         chooser.setAcceptAllFileFilterUsed(false);
+        chooser.putClientProperty("FileChooser.readOnly", Boolean.TRUE);
         int option = chooser.showSaveDialog(null);
         if (option == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
@@ -128,12 +129,11 @@ public class MainFrame {
     }
 
     private File[] selectFilesPathToOpen() {
-        JFileChooser chooser = getFixedFileChooser();
+        JFileChooser chooser = getReadOnlyChooser();
         chooser.setCurrentDirectory(new File("").getAbsoluteFile());
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.addChoosableFileFilter(
                 new FileNameExtensionFilter("Audio file(*.wav *.au *.aiff)", "wav", "au", "aiff"));
-
         chooser.setMultiSelectionEnabled(true);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogTitle("Select audio files");
@@ -141,7 +141,17 @@ public class MainFrame {
         if (option == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFiles();
         }
+
+
         return null;
+    }
+
+    private JFileChooser getReadOnlyChooser() {
+        Boolean old = UIManager.getBoolean("FileChooser.readOnly");
+        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+        JFileChooser chooser = new JFileChooser();
+        UIManager.put("FileChooser.readOnly", old);
+        return chooser;
     }
 
     private void updateSourceList() {
@@ -156,33 +166,33 @@ public class MainFrame {
         clearAllButton.setEnabled(sources.size() != 0);
     }
 
-    private static JFileChooser getFixedFileChooser() {
-        JFileChooser chooser = new JFileChooser();
-        stream(chooser)
-                .filter(JList.class::isInstance)
-                .map(JList.class::cast)
-                .findFirst()
-                .ifPresent(MainFrame::addHierarchyListener);
-        return chooser;
-    }
-
-    // @see https://github.com/aterai/java-swing-tips/blob/master/GetComponentsRecursively/src/java/example/MainPanel.java
-    private static Stream<Component> stream(Container parent) {
-        return Arrays.stream(parent.getComponents())
-                .filter(Container.class::isInstance)
-                .map(c -> stream(Container.class.cast(c)))
-                .reduce(Stream.of(parent), Stream::concat);
-    }
-
-    private static void addHierarchyListener(JList<?> list) {
-        list.addHierarchyListener(e -> {
-            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0
-                    && e.getComponent().isShowing()) {
-                list.putClientProperty("List.isFileList", Boolean.FALSE);
-                list.setLayoutOrientation(JList.VERTICAL);
-            }
-        });
-    }
+//    private static JFileChooser getFixedFileChooser() {
+//        JFileChooser chooser = new JFileChooser();
+//        stream(chooser)
+//                .filter(JList.class::isInstance)
+//                .map(JList.class::cast)
+//                .findFirst()
+//                .ifPresent(MainFrame::addHierarchyListener);
+//        return chooser;
+//    }
+//
+//    // @see https://github.com/aterai/java-swing-tips/blob/master/GetComponentsRecursively/src/java/example/MainPanel.java
+//    private static Stream<Component> stream(Container parent) {
+//        return Arrays.stream(parent.getComponents())
+//                .filter(Container.class::isInstance)
+//                .map(c -> stream(Container.class.cast(c)))
+//                .reduce(Stream.of(parent), Stream::concat);
+//    }
+//
+//    private static void addHierarchyListener(JList<?> list) {
+//        list.addHierarchyListener(e -> {
+//            if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0
+//                    && e.getComponent().isShowing()) {
+//                list.putClientProperty("List.isFileList", Boolean.FALSE);
+//                list.setLayoutOrientation(JList.VERTICAL);
+//            }
+//        });
+//    }
 
 
     {
