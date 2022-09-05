@@ -16,6 +16,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <jar-name>${project.name}-${project.version}</jar-name>
+        <exe-name>${jar-name}</exe-name>
         <main-class>org.vincentyeh.audiomerger.App</main-class>
     </properties>
 
@@ -126,6 +127,36 @@
                         </configuration>
                     </execution>
 
+                </executions>
+            </plugin>
+            <!-- LAUNCH4J -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <jar>target/${jar-name}.jar</jar>
+                            <outfile>target/bin/${exe-name}.exe</outfile>
+                            <downloadUrl>http://www.java.com</downloadUrl>
+                            <classPath>
+                                <mainClass>${main-class}</mainClass>
+                            </classPath>
+                            <jre>
+                                <bundledJre64Bit>false</bundledJre64Bit>
+                                <bundledJreAsFallback>false</bundledJreAsFallback>
+                                <minVersion>${maven.compiler.source}</minVersion>
+                                <jdkPreference>preferJre</jdkPreference>
+                            </jre>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
