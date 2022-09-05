@@ -5,6 +5,7 @@ import org.vincentyeh.audiomerger.recorder.framework.Recorder;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import static java.lang.String.format;
 
@@ -14,13 +15,14 @@ public abstract class SrtRecorder implements Recorder {
 
     private final BufferedWriter writer;
 
-    public SrtRecorder(File recordDestination) throws FileNotFoundException {
+    public SrtRecorder(File recordDestination) throws IOException {
         this(recordDestination, StandardCharsets.UTF_8);
     }
 
-    public SrtRecorder(File recordDestination, Charset charset) throws FileNotFoundException {
+    public SrtRecorder(File recordDestination, Charset charset) throws IOException {
 //        this.recordDestination=recordDestination;
-        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(recordDestination),
+        writer = new BufferedWriter(new OutputStreamWriter(
+                Files.newOutputStream(recordDestination.toPath()),
                 charset));
     }
 

@@ -98,6 +98,15 @@ public class MainFrame {
         if (destination == null)
             return;
 
+        Recorder recorder;
+        try {
+            recorder = getRecorder(destination);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null,e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Recorder finalRecorder = recorder;
         new Thread(() -> {
             AudioMerger merger = new DefaultAudioMerger(type);
             try {
@@ -107,15 +116,15 @@ public class MainFrame {
                             progressBar_progress.setMaximum(total);
                             progressBar_progress.setValue(index + 1);
                             label_progress.setText(format("%d/%d", index + 1, total));
-                        }, getRecorder(destination));
+                        }, finalRecorder);
                 panel_progress.setVisible(false);
             } catch (IOException | UnsupportedAudioFileException ex) {
-                throw new RuntimeException(ex);
+                JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
             }
         }).start();
     }
 
-    private Recorder getRecorder(File destination) throws FileNotFoundException {
+    private Recorder getRecorder(File destination) throws IOException {
         if (!checkBox_export_timeline.isSelected())
             return null;
 
