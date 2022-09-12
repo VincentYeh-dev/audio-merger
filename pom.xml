@@ -32,6 +32,13 @@
             <artifactId>forms_rt</artifactId>
             <version>7.0.3</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jcodec/jcodec -->
+        <dependency>
+            <groupId>org.jcodec</groupId>
+            <artifactId>jcodec</artifactId>
+            <version>0.2.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>
